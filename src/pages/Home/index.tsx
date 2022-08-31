@@ -1,22 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import * as Mui from "@mui/material";
+import { toast } from "react-toastify";
+
 import { Table } from "../../components/Table";
 
-const rows = [
-  {
-    cell1: "valor1",
-    cell2: "valor2",
-    cell3: "valor3",
-    cell4: "valor4",
-    cell5: "valor4",
-    cell6: "valor4",
-    cell7: "valor4",
-    cell8: "valor4",
-    cell9: "valor4",
-    cell10: "valor4",
-  },
-];
+const rows = [[1], [1, 3], [4, 3], [4, 5], [3, 5], [], [], [3, 4]];
+const columns = [1, 2, 3, 4, 5, 6, 7, 7];
 
 export const Home = () => {
   const [fields, setFields] = useState({
@@ -37,6 +27,10 @@ export const Home = () => {
           1
         );
     });
+
+    if (parsedFields.arrayNumbers.length < 2) {
+      return toast.warning("Conteudo invalido", {});
+    }
 
     console.log("ENVIO PARA API", parsedFields);
   }
@@ -101,27 +95,19 @@ export const Home = () => {
 
           <Mui.Grid item xs={12}>
             <Mui.Box mb={2}>
-              <Table
-                columns={[1, 2, 3, 4, 5, 6, 7, 7]}
-                rows={rows}
-                tableName="FIFO"
-              />
+              <Table columns={columns} rows={rows} tableName="FIFO" />
             </Mui.Box>
 
             <Mui.Box mb={2}>
-              <Table
-                columns={[1, 2, 3, 4, 5, 6, 7, 7]}
-                rows={rows}
-                tableName="LIFO"
-              />
+              <Table columns={columns} rows={rows} tableName="LRU" />
             </Mui.Box>
 
             <Mui.Box>
-              <Table
-                columns={[1, 2, 3, 4, 5, 6, 7, 7]}
-                rows={rows}
-                tableName="ÓTIMO"
-              />
+              <Table columns={columns} rows={rows} tableName="ÓTIMO" />
+            </Mui.Box>
+
+            <Mui.Box mb={2}>
+              <Table columns={columns} rows={rows} tableName="LIFO" />
             </Mui.Box>
           </Mui.Grid>
         </Mui.Grid>

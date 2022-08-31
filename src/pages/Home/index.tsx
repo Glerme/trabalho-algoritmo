@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import * as Mui from "@mui/material";
 import { toast } from "react-toastify";
@@ -9,6 +9,13 @@ const rows = [[1], [1, 3], [4, 3], [4, 5], [3, 5], [], [], [3, 4]];
 const columns = [1, 2, 3, 4, 5, 6, 7, 7];
 
 export const Home = () => {
+  const [tableData, setTableData] = useState({
+    lifo: [],
+    fifo: [],
+    otimo: [],
+    lru: [],
+  });
+
   const [fields, setFields] = useState({
     arrayNumbers: "",
     numberOfMemory: "",
@@ -20,6 +27,13 @@ export const Home = () => {
       arrayNumbers: fields.arrayNumbers.split(";"),
     };
 
+    if (
+      parsedFields.arrayNumbers.length < 2 ||
+      parsedFields.arrayNumbers.length > 10
+    ) {
+      return toast.warning("Conteudo invalido");
+    }
+
     parsedFields.arrayNumbers.forEach((value) => {
       if (value === "")
         parsedFields.arrayNumbers.splice(
@@ -28,12 +42,19 @@ export const Home = () => {
         );
     });
 
-    if (parsedFields.arrayNumbers.length < 2) {
-      return toast.warning("Conteudo invalido", {});
-    }
-
     console.log("ENVIO PARA API", parsedFields);
   }
+
+  async function loadTable() {
+    try {
+    } catch (err) {
+      toast.error("Ocorreu um erro");
+    }
+  }
+
+  useEffect(() => {
+    loadTable();
+  }, []);
 
   return (
     <Mui.Container>

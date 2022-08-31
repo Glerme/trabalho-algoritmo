@@ -12,10 +12,6 @@ export const TableHeader = styled("thead")({
 
 export const TableBody = styled("tbody")({
   backgroundColor: "purple",
-
-  "&>:nth-child(1)": {
-    display: "flex",
-  },
 });
 
 export const Row = styled("td")({

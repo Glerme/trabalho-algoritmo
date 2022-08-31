@@ -1,60 +1,78 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import * as Mui from "@mui/material";
 import { toast } from "react-toastify";
 
+import { TableDataProps } from "../../types/TableDataProps";
+
 import { Table } from "../../components/Table";
 
-const rows = [[1], [1, 3], [4, 3], [4, 5], [3, 5], [], [], [3, 4]];
-const columns = [1, 2, 3, 4, 5, 6, 7, 7];
-
 export const Home = () => {
-  const [tableData, setTableData] = useState({
+  const [tableData, setTableData] = useState<TableDataProps>({
+    columns: [],
     lifo: [],
     fifo: [],
     otimo: [],
     lru: [],
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [fields, setFields] = useState({
     arrayNumbers: "",
     numberOfMemory: "",
   });
 
-  function handleSubmit() {
-    const parsedFields = {
-      ...fields,
-      arrayNumbers: fields.arrayNumbers.split(";"),
-    };
+  async function handleSubmit() {
+    setIsLoading(true);
 
-    if (
-      parsedFields.arrayNumbers.length < 2 ||
-      parsedFields.arrayNumbers.length > 10
-    ) {
-      return toast.warning("Conteudo invalido");
-    }
-
-    parsedFields.arrayNumbers.forEach((value) => {
-      if (value === "")
-        parsedFields.arrayNumbers.splice(
-          parsedFields.arrayNumbers.indexOf(value),
-          1
-        );
-    });
-
-    console.log("ENVIO PARA API", parsedFields);
-  }
-
-  async function loadTable() {
     try {
-    } catch (err) {
+      const parsedFields = {
+        ...fields,
+        arrayNumbers: fields.arrayNumbers.split(";"),
+      };
+
+      if (parsedFields.arrayNumbers.length < 2) {
+        return toast.warning("Conteudo invalido");
+      }
+
+      parsedFields.arrayNumbers.forEach((value) => {
+        if (value === "")
+          parsedFields.arrayNumbers.splice(
+            parsedFields.arrayNumbers.indexOf(value),
+            1
+          );
+      });
+
+      const response = await fetch("http://127.0.0.1:8000", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: parsedFields.arrayNumbers,
+          frames: parsedFields.numberOfMemory,
+        }),
+      });
+
+      const { fifo, lifo, otimo, lru } = await response.json();
+
+      setTableData({
+        columns: parsedFields.arrayNumbers,
+        fifo,
+        lifo,
+        lru,
+        otimo,
+      });
+
+      toast.success("Tabelas Atualizadas");
+    } catch (e) {
+      console.error(e);
       toast.error("Ocorreu um erro");
+    } finally {
+      setIsLoading(false);
     }
   }
-
-  useEffect(() => {
-    loadTable();
-  }, []);
 
   return (
     <Mui.Container>
@@ -114,23 +132,47 @@ export const Home = () => {
             </Mui.Box>
           </Mui.Grid>
 
-          <Mui.Grid item xs={12}>
-            <Mui.Box mb={2}>
-              <Table columns={columns} rows={rows} tableName="FIFO" />
-            </Mui.Box>
+          {isLoading ? (
+            <Mui.CircularProgress />
+          ) : (
+            tableData.fifo.length > 0 &&
+            tableData.lifo.length > 0 &&
+            tableData.lru.length > 0 && (
+              <Mui.Grid item xs={12}>
+                <Mui.Box mb={2}>
+                  <Table
+                    columns={tableData.columns}
+                    rows={tableData.fifo}
+                    tableName="FIFO"
+                  />
+                </Mui.Box>
 
-            <Mui.Box mb={2}>
-              <Table columns={columns} rows={rows} tableName="LRU" />
-            </Mui.Box>
+                <Mui.Box mb={2}>
+                  <Table
+                    columns={tableData.columns}
+                    rows={tableData.lru}
+                    tableName="LRU"
+                  />
+                </Mui.Box>
 
-            <Mui.Box>
-              <Table columns={columns} rows={rows} tableName="ÓTIMO" />
-            </Mui.Box>
+                {/* <Mui.Box mb={2}>
+                  <Table
+                    columns={tableData.columns}
+                    rows={tableData.otimo}
+                    tableName="ÓTIMO"
+                  />
+                </Mui.Box> */}
 
-            <Mui.Box mb={2}>
-              <Table columns={columns} rows={rows} tableName="LIFO" />
-            </Mui.Box>
-          </Mui.Grid>
+                <Mui.Box mb={2}>
+                  <Table
+                    columns={tableData.columns}
+                    rows={tableData.lifo}
+                    tableName="LIFO"
+                  />
+                </Mui.Box>
+              </Mui.Grid>
+            )
+          )}
         </Mui.Grid>
       </Mui.Box>
     </Mui.Container>

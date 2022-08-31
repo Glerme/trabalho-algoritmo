@@ -1,19 +1,19 @@
 import { TableHeader } from "../TableHeader";
 
+import * as Mui from "@mui/material";
 import * as Styled from "./styles";
 
 interface TableProps {
   rows: number[][];
-  columns: any[];
+  columns: string[];
   tableName: string;
 }
 
 export const Table: React.FC<TableProps> = ({ columns, rows, tableName }) => {
-  console.log(rows.map((row) => row));
-
   return (
     <div style={{ width: "100%" }}>
-      <TableHeader tableName={tableName} />
+      <TableHeader tableName={tableName} fails={rows?.length} />
+
       <Styled.TableStyled>
         <Styled.TableHeader>
           {columns.map((column, i) => (

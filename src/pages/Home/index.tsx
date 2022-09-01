@@ -24,9 +24,13 @@ export const Home = () => {
   });
 
   async function handleSubmit() {
-    setIsLoading(true);
+    if (fields.arrayNumbers === "" || fields.numberOfMemory === "") {
+      return toast.warning("Preencha os campos corretamente");
+    }
 
     try {
+      setIsLoading(true);
+
       const parsedFields = {
         ...fields,
         arrayNumbers: fields.arrayNumbers.split(";"),
@@ -92,7 +96,10 @@ export const Home = () => {
                 }}
                 value={fields.arrayNumbers}
                 onChange={(e) =>
-                  setFields({ ...fields, arrayNumbers: e.target.value })
+                  setFields({
+                    ...fields,
+                    arrayNumbers: e.target.value.replace(/[^;0-9]/g, ""),
+                  })
                 }
               />
             </Mui.Box>
@@ -118,6 +125,7 @@ export const Home = () => {
                 onChange={(e) =>
                   setFields({ ...fields, numberOfMemory: e.target.value })
                 }
+                type="number"
               />
 
               <Mui.Box pt={1} pb={4} width={"100%"}>
